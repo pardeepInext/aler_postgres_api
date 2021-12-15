@@ -8,6 +8,7 @@ use App\Models\Subscriber;
 use App\Mail\subscribe;
 use App\Mail\ContactUs;
 use App\Models\Message;
+use App\Mail\ReplyMailer;
 use Illuminate\Support\Facades\Mail;
 
 class ContactUsContoller extends Controller
@@ -51,6 +52,22 @@ class ContactUsContoller extends Controller
         $sent = Mail::to($request->email)->send(new ContactUs($request->only('email', 'name', 'message')));
 
         if ($message)
-            return response(["success" => true, 'message'=>'message sent successfully!']);
+            return response(["success" => true, 'message' => 'message sent successfully!']);
+    }
+
+    function messageList()
+    {
+        return Message::paginate(10);
+    }
+
+    function sendMessage($id, Request $request)
+    {
+        $message = Message::find($id);
+
+
+        $sent = Mail::to($message->email)->send(new ReplyMailer(['name' => $message->name, 'message' => $request->message]));
+        $update = $message->update(['is_resolved' => true]);
+
+        return $update ? ['success' => true] : ['success' => false];
     }
 }

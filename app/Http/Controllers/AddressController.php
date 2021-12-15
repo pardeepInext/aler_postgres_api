@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\State;
 use App\Models\Property;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class AddressController extends Controller
 {
@@ -36,7 +37,20 @@ class AddressController extends Controller
             'propertyLocation.country:id,name'
         ])->get();
 
-        $propertyCount = Property::select('type',DB::raw('count(type) as count'))->groupBy('type')->get();
+        $propertyCount = Property::select('type', DB::raw('count(type) as count'))->groupBy('type')->get();
         return response(['properties' => $property, "count" => $propertyCount]);
+    }
+
+    function dashboard()
+    {
+        $counts = [];
+        $users =  User::select(DB::raw('count(role_id) as count,role_id as role'))->groupBy('role_id')->get();
+
+        $counts['properties'] = Property::count();
+
+        foreach ($users as $user)
+            $counts[User::ROLES[$user->role]] = $user->count;
+
+        return $counts;
     }
 }

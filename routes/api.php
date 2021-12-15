@@ -6,12 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactUsContoller;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
-use App\Models\City;
-use App\Models\State;
-
+use App\Models\Role;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -39,9 +38,16 @@ Route::post('contactmessage', [ContactUsContoller::class, 'contactMessage']);
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
+Route::delete('logout/{id}', [AuthController::class, 'logout']);
+
+Route::get('/dashboard', [AddressController::class, 'dashboard']);
+Route::get('/messages', [ContactUsContoller::class, 'messageList']);
+Route::put('/sendmessage/{id}', [ContactUsContoller::class, 'sendMessage']);
 
 Route::apiResources([
     '/properties' => PropertyController::class,
     '/blogs' => BlogController::class,
     '/agents' => AgentController::class,
+    '/users' => UserController::class,
+    '/roles' => RoleController::class
 ]);

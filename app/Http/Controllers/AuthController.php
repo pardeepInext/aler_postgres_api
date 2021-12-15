@@ -18,17 +18,19 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails())
-            return response(['success' => false, 'errors' => $validator->errors()],401);
+            return response(['success' => false, 'errors' => $validator->errors()]);
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user)
-            return response(['success' => false, 'errors' => ['email' =>
-            "your email is not matched with our records"]]);
+            return response(['success' => false, 'errors' => ['email' => [
+                "your email is not matched with our records"
+            ]]]);
 
-        if (Hash::check($request->password, $user->password))
-            return response(['success' => false, 'errors' => ['password' =>
-            "password is incorrect"]]);
+        if (!Hash::check($request->password, $user->password))
+            return response(['success' => false, 'errors' => ['password' => [
+                "password is incorrect"
+            ]]]);
 
         $user['token'] = $user->createToken($user->name)->plainTextToken;
 
@@ -47,9 +49,20 @@ class AuthController extends Controller
         if ($validator->fails())
             return response(['success' => false, 'errors' => $validator->errors()]);
 
-        $user = User::create($request->only('email', 'password', 'name'));
+        $userInsert = $request->only('email', 'name');
+        $userInsert['password'] = Hash::make($request->password);
+
+        $user = User::create($userInsert);
 
         $user['token'] = $user->createToken($user->name)->plainTextToken;
         return response(['success' => true, 'user' => $user]);
+    }
+
+    function logout($id)
+    {
+        $user = User::find($id);
+        $deleteToken = $user->tokens()->delete();
+        if ($deleteToken)
+            return response(['success' => true]);
     }
 }

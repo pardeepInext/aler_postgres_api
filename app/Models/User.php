@@ -17,6 +17,8 @@ class User extends Authenticatable
      *
      * @var string[]
      */
+
+    const ROLES = ['1' => 'admin', '2' => 'user', '3' => 'agent'];
     protected $fillable = [
         'name',
         'email',
@@ -47,6 +49,11 @@ class User extends Authenticatable
     function getImageAttribute()
     {
         return asset("uploads/user.png");
+    }
+
+    function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 
     function properties()
