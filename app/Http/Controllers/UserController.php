@@ -33,6 +33,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -70,6 +71,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -95,5 +97,44 @@ class UserController extends Controller
     {
         $delete =  $user->delete();
         return ['success' => true];
+    }
+
+    public function verifyPassword($id, Request $request)
+    {
+        $user = User::find($id);
+        return ['status' => Hash::check($request->password, $user->password)];
+    }
+
+    public function updateProfile($id, Request $request)
+    {
+
+        $user =  User::find($id);
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails())
+            return ['success' => false, 'errors' => $validator->errors()];
+
+        $updateUser = $request->only('name');
+
+        if ($request->has('email'))
+            $updateUser['email'] = $request->email;
+
+        if ($request->has('password'))
+            $updateUser['password'] = Hash::make($request->password);
+
+        if ($request->has('image')) {
+            if (file_exists(public_path("uploads/" . $user->image_name)))
+                unlink(public_path("uploads/" . $user->image_name));
+            $updateUser['image_name']  = $user->id . "_profile_" . time() . "." . $request->image->extension();
+            $request->image->move(public_path('uploads'), $updateUser['image_name']);
+        }
+
+        $user->update($updateUser);
+        return response(['success' => true, 'message' => "user is updated!"]);
     }
 }

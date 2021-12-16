@@ -43,6 +43,9 @@ Route::delete('logout/{id}', [AuthController::class, 'logout']);
 Route::get('/dashboard', [AddressController::class, 'dashboard']);
 Route::get('/messages', [ContactUsContoller::class, 'messageList']);
 Route::put('/sendmessage/{id}', [ContactUsContoller::class, 'sendMessage']);
+Route::put('/verifypassword/{id}', [UserController::class, 'verifyPassword']);
+Route::post('/profile/{id}', [UserController::class, 'updateProfile']);
+
 
 Route::apiResources([
     '/properties' => PropertyController::class,

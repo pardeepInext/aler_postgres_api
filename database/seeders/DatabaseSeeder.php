@@ -8,6 +8,7 @@ use Database\Seeders\PropertySeeder;
 use Database\Seeders\CitySeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\BlogSeeder;
+use Database\Seeders\UserSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,10 +19,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::factory()->count(10)->create([
-            'role_id' => rand(1, 3)
-        ]);
-
         $this->call([
             PropertySeeder::class,
             CountrySeeder::class,
@@ -29,6 +26,7 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             RoleSeeder::class,
             BlogSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

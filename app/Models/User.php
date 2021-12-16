@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'image_name'
     ];
 
     protected $appends = ['image'];
@@ -48,7 +49,7 @@ class User extends Authenticatable
 
     function getImageAttribute()
     {
-        return asset("uploads/user.png");
+        return  $this->image_name != "" ? asset("uploads/$this->image_name") : asset("uploads/user.png");
     }
 
     function role()
