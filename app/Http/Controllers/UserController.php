@@ -110,31 +110,37 @@ class UserController extends Controller
 
         $user =  User::find($id);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'required',
-        ]);
+        $validateArr = ['name' => 'required'];
+        $updateUser = $request->only('name');
+
+        if ($request->has('email')) {
+            $updateUser['email'] = $request->email;
+            $validateArr['email'] = 'email|unique:users,email,' . $user->id;
+        }
+        $validator = Validator::make($request->all(), $validateArr);
 
         if ($validator->fails())
             return ['success' => false, 'errors' => $validator->errors()];
 
-        $updateUser = $request->only('name');
+        
+       
 
-        if ($request->has('email'))
-            $updateUser['email'] = $request->email;
+
 
         if ($request->has('password'))
             $updateUser['password'] = Hash::make($request->password);
 
         if ($request->has('image')) {
-            if (file_exists(public_path("uploads/" . $user->image_name)))
+            if ($user->image_name != "" && file_exists(public_path("uploads/" . $user->image_name)))
                 unlink(public_path("uploads/" . $user->image_name));
             $updateUser['image_name']  = $user->id . "_profile_" . time() . "." . $request->image->extension();
             $request->image->move(public_path('uploads'), $updateUser['image_name']);
         }
 
-        $user->update($updateUser);
-        return response(['success' => true, 'message' => "user is updated!"]);
+        $update =  $user->update($updateUser);
+        if ($update) {
+            $updatedUser = User::find($id);
+            return response(['success' => true, 'message' => "user is updated!", "user" => $updatedUser]);
+        }
     }
 }

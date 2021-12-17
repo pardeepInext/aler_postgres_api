@@ -25,7 +25,12 @@ class Property extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    function user(){
+    function user()
+    {
         return $this->belongsTo(User::class);
+    }
+
+    function likes(){
+        return $this->hasMany(PropertyLike::class);
     }
 }

@@ -46,6 +46,7 @@ Route::put('/sendmessage/{id}', [ContactUsContoller::class, 'sendMessage']);
 Route::put('/verifypassword/{id}', [UserController::class, 'verifyPassword']);
 Route::post('/profile/{id}', [UserController::class, 'updateProfile']);
 
+Route::post('/liketoggle',[PropertyController::class,'likeToggle']);
 
 Route::apiResources([
     '/properties' => PropertyController::class,

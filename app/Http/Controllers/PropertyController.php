@@ -6,6 +6,7 @@ use App\Models\Property;
 use Illuminate\Http\Request;
 use App\Models\PropertyFeatured;
 use App\Models\Image;
+use App\Models\PropertyLike;
 use App\Models\PropertyLocation;
 use Illuminate\Support\Facades\Validator;
 
@@ -43,8 +44,11 @@ class PropertyController extends Controller
             'propertyLocation',
             'propertyLocation.city:id,name',
             'propertyLocation.state:id,name',
-            'propertyLocation.country:id,name'
-        ])->paginate(3);
+            'propertyLocation.country:id,name',
+            'likes' => fn ($qry) => $qry->where('is_liked', true)
+        ])
+            ->withCount(['likes' => fn ($qry) => $qry->where('is_liked', true)])
+            ->paginate(3);
     }
 
     /**
@@ -141,5 +145,34 @@ class PropertyController extends Controller
     public function destroy(Property $property)
     {
         //
+    }
+
+    public function likeToggle(Request $request)
+    {
+        // $like = PropertyLike::where([
+        //     ['user_id', $request->user_id],
+        //     ['property_id', $request->property_id]
+        // ])->first();
+
+        // $success = true;
+
+        $newLikeCount = PropertyLike::where([
+            ['property_id', '=', $request->property_id],
+            ['is_liked', '=', true]
+        ])
+            ->count();
+
+        PropertyLike::updateOrInsert($request->only('user_id', 'property_id'));
+        // if ($like) {
+        //     $liking =  $like->update(['is_liked' => !$like->is_liked]);
+        //     $success = $liking;
+        //     return ['success' => $success, 'count' => $newLikeCount];
+        // } else {
+
+        //     $liking = PropertyLike::create($request->only('user_id', 'property_id'));
+        // }
+
+        // return $liking ? ['success' => true, 'count' => $newLikeCount] : ['success' => false];
+        return ['success' => true, 'count' => $newLikeCount];
     }
 }
